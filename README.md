@@ -5,7 +5,7 @@
 ## 快速开始
 
 ```
-制谱器/v4R/index.html
+index.html
 ```
 
 用浏览器直接打开即可使用。无需安装、无需服务器。
@@ -64,6 +64,7 @@
   "meta": {
     "bpm": 120,
     "sampleRateReal": 10.0,
+    "offsetSec": 0,
     "duration": 30,
     "fov": 55,
     "audioPath": "song.mp3"
@@ -91,7 +92,6 @@
 ## 项目结构
 
 ```
-v4R/
 ├── index.html        # 页面入口
 ├── style.css         # 深色主题样式
 ├── state.js          # 全局状态 + 表达式系统
@@ -108,7 +108,10 @@ v4R/
 ├── init.js           # 初始化
 ├── validation.js     # 校验
 ├── sfx.js            # 音效
-└── sound/            # 音效文件
+├── sound/            # 音效文件（Tap.mp3, Keep.mp3, Hold.mp3）
+├── HALOVIA.md        # 游戏介绍
+├── HALOVIA_制谱器_v2_架构说明.md  # v2 架构分析
+└── 检查清单.md        # 开发自查清单
 ```
 
 ## 分支规划
@@ -116,7 +119,7 @@ v4R/
 | 分支 | 用途 | 维护策略 |
 |------|------|---------|
 | `main` | 稳定主线 | 仅通过 `v5` merge 进入，**禁止直接提交** |
-| `v5` | 开发分支 | 日常开发在此进行，定期 merge 到 `main` |
+| `v5` | 当前开发分支 | 日常开发在此进行，定期 merge 到 `main` |
 | `v4R` | 旧版存档 | 不再维护，保留历史 |
 
 工作流：`v5` 开发 → `git merge v5` 到 `main`（仅 merge，不 rebase）
