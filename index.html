@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HALOVIA 制谱器 v4R</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎹</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="topbar">
+  <h1>🎵 HALOVIA 制谱器 <small style="color:var(--fg3);font-size:0.6em;">v4R</small><button class="help-btn" onclick="showHelp()" title="操作说明">?</button></h1>
+  <div class="audio-bar">
+    <label class="audio-label">音频:</label>
+    <input type="file" id="audioFile" accept="audio/*">
+    <span id="audioInfo" class="audio-info">未加载</span>
+  </div>
+  <div class="io-bar">
+    <button onclick="exportHVP()">导出 .hvp</button>
+    <button onclick="copyHVP()">复制 .hvp</button>
+    <button onclick="exportHVF()">导出 .hvf</button>
+    <button class="secondary" onclick="showImportModal()">导入</button>
+    <span id="sizeEstimate" class="size-info">预估: -</span>
+  </div>
+</header>
+
+<div class="main-layout">
+  <aside id="leftPanel">
+    <div id="trackDirectory">
+      <div class="dir-header">
+        <span>轨道目录</span>
+        <button class="small" onclick="addNewTrack()">+ 添加</button>
+      </div>
+      <div id="trackDirList"></div>
+    </div>
+    <div id="trackPanelsContainer">
+      <div id="trackPanels"></div>
+    </div>
+  </aside>
+
+  <main id="rightPanel">
+    <div id="topRow">
+      <section id="previewSection" class="panel preview-panel">
+        <div class="preview-header">
+          <h2>预览 / 试玩</h2>
+          <div class="preview-toolbar">
+            <button onclick="togglePlay()" id="btnPlay">▶ 播放</button>
+            <button onclick="stopPlay()">⏹ 停止</button>
+            <button class="secondary" onclick="showPlayModal()">🎮 试玩</button>
+            <button class="secondary" onclick="togglePreviewFullscreen()">⛶ 全屏</button>
+            <label class="inline-chk"><input type="checkbox" id="chkBeatLines" checked> 节拍线</label>
+          </div>
+        </div>
+        <div id="previewWrap" class="preview-wrap">
+          <canvas id="previewCanvas"></canvas>
+          <div id="comboDisplay" class="combo-display"></div>
+          <div id="scoreDisplay" class="score-display">0</div>
+        </div>
+        <div class="preview-controls">
+          <input type="range" id="timeSlider" min="0" max="1000" value="0" step="1">
+          <span id="timeDisplay">0.00s</span>
+        </div>
+      </section>
+      <section id="globalSection" class="panel">
+        <h2>全局参数</h2>
+        <div class="global-body">
+          <div class="global-fields">
+            <div class="global-field-row"><label>BPM</label><input type="text" class="expr-input" id="gBPM" value="120"></div>
+            <div class="global-field-row"><label>采样频率(Hz)</label><input type="text" class="expr-input" id="gSampleRate" value="10"></div>
+            <div class="global-field-row"><label>偏移(秒)</label><input type="text" class="expr-input" id="gOffset" value="0"></div>
+            <div class="global-field-row"><label>总时长(秒)</label><input type="text" class="expr-input" id="gDuration" value="30"></div>
+            <div class="global-field-row"><label>FOV(°)</label><input type="text" class="expr-input" id="gFOV" value="55"></div>
+          </div>
+          <div class="volume-panel">
+            <div class="volume-item">
+              <label>音效</label>
+              <input type="range" id="volHit" min="0" max="100" value="70" class="vertical-slider" orient="vertical">
+              <span id="volHitVal">70</span>
+            </div>
+            <div class="volume-item">
+              <label>音乐</label>
+              <input type="range" id="volMusic" min="0" max="100" value="70" class="vertical-slider" orient="vertical">
+              <span id="volMusicVal">70</span>
+            </div>
+          </div>
+        </div>
+        <div class="note-scale-panel">
+          <label>音符大小</label>
+          <input type="range" id="gNoteScale" min="20" max="200" value="100" class="note-scale-slider">
+          <span class="note-scale-val" id="noteScaleVal">100%</span>
+        </div>
+        <div class="note-scale-panel">
+          <label>倍速</label>
+          <input type="range" id="gSpeed" min="5" max="500" value="100" class="note-scale-slider">
+          <span class="note-scale-val" id="speedVal">1.00x</span>
+        </div>
+      </section>
+    </div>
+<section id="timelineSection" class="panel">
+      <div class="timeline-header">
+        <h2>时间轴</h2>
+        <div class="timeline-toolbar">
+          <label class="inline-chk"><input type="checkbox" id="chkSnap" checked> 吸附到采样周期</label>
+          <span id="snapInfo" class="hint"></span>
+          <span class="hint">|</span>
+          <button class="small secondary" id="btnLoopA" onclick="setLoopA()" title="设循环起点 (Ctrl+Shift+A)">A</button>
+          <button class="small secondary" id="btnLoopB" onclick="setLoopB()" title="设循环终点 (Ctrl+Shift+B)">B</button>
+          <button class="small secondary" id="btnLoopToggle" onclick="toggleLoop()" title="启用/停用循环">↺</button>
+          <button class="small secondary" id="btnPlayA" onclick="playFromA()" title="从 A 播放到 B（单次）">▶</button>
+          <button class="small secondary" id="btnClearLoop" onclick="clearLoop()" title="清除 A/B 点">✕</button>
+          <span id="loopInfo" class="hint"></span>
+        </div>
+      </div>
+      <div id="timelineWrap" class="timeline-wrap">
+        <canvas id="timelineCanvas"></canvas>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="modal-overlay" id="importModal"><div class="modal"><h2>导入谱面</h2><label>选择格式</label><select id="importFormat"><option value="hvp">.hvp (十进制编码)</option><option value="hvf">.hvf (JSON完整)</option></select><label>粘贴内容</label><textarea id="importText" rows="6" placeholder="粘贴 .hvp 字符串或 .hvf JSON..."></textarea><label>或上传文件</label><input type="file" id="importFile" accept=".hvp,.hvf,.txt,.json"><div class="modal-actions"><button onclick="doImport()">导入</button><button class="secondary" onclick="closeImportModal()">取消</button></div></div></div>
+<div class="modal-overlay" id="noteEditModal"><div class="modal"><h2>编辑音符</h2><div class="row"><div><label>轨道</label><input type="text" class="expr-input" id="editTrack"></div><div><label>类型</label><select id="editType"><option value="1">Tap</option><option value="2">Keep</option><option value="3">Hold</option></select></div></div><div class="row"><div><label>时间</label><input type="text" class="expr-input" id="editTime"></div><div><label>单位</label><select id="editTimeUnit"><option value="sec">秒</option><option value="beat">拍</option></select></div></div><div class="row" id="editDurationRow"><div><label>持续时长</label><input type="text" class="expr-input" id="editDuration"></div><div><label>单位</label><select id="editDurationUnit"><option value="sec">秒</option><option value="beat">拍</option></select></div></div><div class="modal-actions"><button class="danger" onclick="deleteEditingNote()">删除</button><span style="flex:1;"></span><button class="secondary" onclick="closeNoteEditModal()">取消</button><button onclick="saveEditingNote()">确定</button></div></div></div>
+<div class="modal-overlay" id="keyMapModal"><div class="modal"><h2>键位映射</h2><p class="hint">点击轨道行后按下键盘按键完成绑定（支持 Shift/Ctrl/Alt 修饰键）。</p><div id="keyMapList"></div><div class="modal-actions"><button class="secondary" onclick="resetKeyMapDefault()">重置默认</button><button class="secondary" onclick="closeKeyMapModal()">取消</button><button onclick="confirmKeyMapAndPlay()">确认并开始</button></div></div></div>
+<div class="modal-overlay" id="pauseModal"><div class="modal"><h2>已暂停</h2><div class="modal-actions" style="justify-content:center;flex-direction:column;gap:8px;"><button onclick="resumePlay()">继续</button><button class="secondary" onclick="retryPlay()">重试</button><button class="danger" onclick="exitPlay()">退出</button></div></div></div>
+<div class="modal-overlay" id="resultModal"><div class="modal"><h2>游戏结算</h2><div id="resultScore" class="result-score">0</div><div class="modal-actions" style="justify-content:center;"><button onclick="closeResultModal()">关闭</button></div></div></div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this)closeHelp()">
+  <div class="modal help-modal">
+    <div class="help-grid">
+      <div class="help-section">
+        <h3>🎯 基本操作</h3>
+        <div class="help-row"><span class="help-key">左键轨道</span><span class="help-desc">添加 Tap</span></div>
+        <div class="help-row"><span class="help-key">右键轨道</span><span class="help-desc">添加 Keep</span></div>
+        <div class="help-row"><span class="help-key">右键拖动</span><span class="help-desc">添加 Hold</span></div>
+        <div class="help-row"><span class="help-key">双击音符</span><span class="help-desc">编辑音符</span></div>
+        <div class="help-row"><span class="help-key">拖拽音符</span><span class="help-desc">移动/跨轨道</span></div>
+        <div class="help-row"><span class="help-key">拖拽 Hold 右端</span><span class="help-desc">调整时长</span></div>
+      </div>
+      <div class="help-section">
+        <h3>⌨️ 快捷键</h3>
+        <div class="help-row"><span class="help-key">Ctrl+Z</span><span class="help-desc">撤销</span></div>
+        <div class="help-row"><span class="help-key">Ctrl+Y / Ctrl+Shift+Z</span><span class="help-desc">重做</span></div>
+        <div class="help-row"><span class="help-key">Ctrl+S</span><span class="help-desc">导出 .hvf</span></div>
+        <div class="help-row"><span class="help-key">Ctrl+O</span><span class="help-desc">导入谱面</span></div>
+      </div>
+      <div class="help-section">
+        <h3>🖱️ 时间轴</h3>
+        <div class="help-row"><span class="help-key">滚轮</span><span class="help-desc">水平平移</span></div>
+        <div class="help-row"><span class="help-key">Ctrl+滚轮</span><span class="help-desc">缩放</span></div>
+        <div class="help-row"><span class="help-key">Ctrl+左键菱形</span><span class="help-desc">拖拽关键帧</span></div>
+        <div class="help-row"><span class="help-key">拖动红色游标</span><span class="help-desc">跳转播放位置</span></div>
+        <div class="help-row"><span class="help-key">Alt</span><span class="help-desc">临时禁用吸附</span></div>
+      </div>
+      <div class="help-section">
+        <h3>🎨 预览区</h3>
+        <div class="help-row"><span class="help-key">拖拽判定环</span><span class="help-desc">创建/修改关键帧</span></div>
+        <div class="help-row"><span class="help-key">?</span><span class="help-desc">打开/关闭说明</span></div>
+      </div>
+      <div class="help-section">
+        <h3>📐 轨道编辑</h3>
+        <div class="help-row"><span class="help-key">+ 关键帧</span><span class="help-desc">当前时间添加</span></div>
+        <div class="help-row"><span class="help-key">✕ 删除</span><span class="help-desc">删除关键帧</span></div>
+        <div class="help-row"><span class="help-key">预设下拉</span><span class="help-desc">切换运动方式</span></div>
+        <div class="help-row"><span class="help-key">隐藏勾选</span><span class="help-desc">隐藏关键帧</span></div>
+      </div>
+      <button class="help-close" onclick="closeHelp()">✕</button>
+    </div>
+  </div>
+<script src="state.js"></script>
+<script src="presets.js"></script>
+<script src="validation.js"></script>
+<script src="ui.js"></script>
+<script src="audio.js"></script>
+<script src="sfx.js"></script>
+<script src="io.js"></script>
+<script src="notes.js"></script>
+<script src="tracks.js"></script>
+<script src="timeline.js"></script>
+<script src="preview.js"></script>
+<script src="gameplay.js"></script>
+<script src="undo.js"></script>
+<script src="init.js"></script>
+</body>
+</html>
+
+

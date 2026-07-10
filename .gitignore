@@ -1,0 +1,12 @@
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# 编辑器
+*.swp
+*.swo
+*~
+
+# 杂项
+*.log
+*.tmp
