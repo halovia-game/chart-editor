@@ -1,7 +1,7 @@
 # HALOVIA 制谱器 — Chart Editor
 
 > **🚀 当前开发分支**
-> 此分支（`v6R`）为当前活跃开发分支，由 Reasonix 驱动。
+> 此分支（`Dev`）为永久开发分支，所有版本通过 tag 标记。
 >
 > 历史存档：[`v4R`](https://github.com/halovia-game/chart-editor/tree/v4R) · [`v5OC`](https://github.com/halovia-game/chart-editor/tree/v5OC) · [`v5R`](https://github.com/halovia-game/chart-editor/tree/v5R)
 
@@ -98,7 +98,13 @@ index.html
 
 ```
 ├── index.html        # 页面入口
-├── css/style.css     # 深色主题样式
+├── css/
+│   ├── core.css      # 核心: 变量、表单、按钮、滚动条、Toast
+│   ├── layout.css    # 布局: 顶栏、面板骨架、全局参数
+│   ├── tracks.css    # 轨道: 目录、面板、分段卡片
+│   ├── preview.css   # 预览: 3D 场景、全屏、控件
+│   ├── timeline.css  # 时间轴: 画布、工具栏
+│   └── modals.css    # 弹窗: 所有弹出层
 ├── js/state.js       # 全局状态 + 表达式系统
 ├── js/presets.js     # 运动预设 + 轨道求值
 ├── js/tracks.js      # 轨道面板 UI
@@ -123,13 +129,15 @@ index.html
 
 | 分支 | 用途 | 维护策略 |
 |------|------|---------|
-| `main` | 稳定主线 | 仅通过 `v6R` merge 进入，**禁止直接提交** |
-| `v6R` | **当前开发分支** | 日常开发在此进行，定期 merge 到 `main` |
-| `v5R` | 已归档存档 | 不再维护，保留历史 |
-| `v5OC` | 已冻结存档 | 不再维护，保留历史 |
+| 分支 | 用途 | 维护策略 |
+|------|------|---------|
+| `Dev` | **永久开发分支** | 所有开发在此进行，版本发布时打 tag |
+| `main` | 稳定主线 | 仅通过 `Dev` merge 进入，**禁止直接提交** |
+| `v5R` | 已归档存档（Reasonix） | 不再维护，保留历史 |
+| `v5OC` | 已冻结存档（OpenCode） | 不再维护，保留历史 |
 | `v4R` | 旧版存档 | 不再维护，保留历史 |
 
-工作流：`v6R` 开发 → `git merge v6R` 到 `main`（仅 merge，不 rebase）；`v6R` 将重构页面结构（页面重构）。
+工作流：`Dev` 开发 → `git merge Dev` 到 `main`（仅 merge，不 rebase）；版本更新时在 `Dev` 上打 tag（如 `v6.0`、`v7.0`），不再新开分支。
 
 ## 开发
 
