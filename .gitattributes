@@ -1,1 +1,8 @@
 * text=auto
+
+# GitHub Pages 部署排除（export-ignore 对 git push 无影响，仅影响 Pages 的 git archive 构建）
+ARCHITECTURE.md              export-ignore
+reasonix.toml                export-ignore
+.gitignore                   export-ignore
+检查清单.md                   export-ignore
+HALOVIA_制谱器_v2_架构说明.md  export-ignore
